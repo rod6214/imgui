@@ -14,9 +14,65 @@
 #include <SDL_opengl.h>
 #endif
 
+// Start Poty Pro includes
+#include "application.h"
+#include "Events.h"
+#include <iostream>
+// End Poty Pro includes
+
+class Base
+{
+public:
+    virtual void Message();
+};
+
+class Derived : public Base
+{
+public:
+    Derived(){}
+    virtual void Message();
+};
+
+class Opp
+{
+public:
+    void AddElement(Base& el);
+private:
+    std::vector<Base> elements;
+};
+
+void Opp::AddElement(Base& el)
+{
+    elements.push_back(el);
+}
+
+//void Derived::Base::Message ()
+//{
+//    std::cout << "Derived" << std::endl;
+//}
+
+void Base::Message()
+{
+    std::cout << "Base" << std::endl;
+}
+
+void Derived::Message()
+{
+    std::cout << "Derived" << std::endl;
+}
+
+//static void testMethod(Base& el)
+//{
+//    el.Message();
+//}
+
 // Main code
 int main(int, char**)
 {
+    /*std::vector<Base> els;
+    Derived dev;
+    els.push_back(dev);
+    testMethod(dev);*/
     // Setup SDL
     // (Some versions of SDL before <2.0.10 appears to have performance/stalling issues on a minority of Windows systems,
     // depending on whether SDL_INIT_GAMECONTROLLER is enabled or disabled.. updating to the latest version of SDL is recommended!)
@@ -64,12 +120,24 @@ int main(int, char**)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+    //io.ConfigViewportsNoAutoMerge = true;
+    //io.ConfigViewportsNoTaskBarIcon = true;
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
+
+    // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
@@ -92,10 +160,16 @@ int main(int, char**)
     //IM_ASSERT(font != NULL);
 
     // Our state
-    bool show_demo_window = true;
-    bool show_another_window = false;
+    bool show_demo_window = false;
+    bool show_another_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    bool show_poty_prom = true;
+
+    // Add MainWindow object
+    POTYPROM::Window<POTYPROM::TablePanel> mainWindow(window, show_poty_prom);
+    POTYPROM::TablePanel table;
+    mainWindow.AddElement(table);
     // Main loop
     bool done = false;
     while (!done)
@@ -109,6 +183,27 @@ int main(int, char**)
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
+            if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
+            {
+                POTYPROM::EventInfo_t eventInfo = {
+                    event.button.timestamp,
+                    event.button.windowID
+                };
+                POTYPROM::FocusArgs_t args;
+
+                //ImGui::ImGui_ImplSDL2_Data* bd = ImGui::ImGui_ImplSDL2_GetBackendData();
+                
+                /*if (event.window.windowID == SDL_GetWindowID(window))
+                {
+                    auto d = ImGui::GetID("MainPanel");
+                    ImGui::SetWindowFocus("MainPanel");
+                    
+                }*/
+
+                
+
+                mainWindow.OnFocus(eventInfo, args);
+            }
             if (event.type == SDL_QUIT)
                 done = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
@@ -120,6 +215,11 @@ int main(int, char**)
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
+        // Start Poty Pro window
+        mainWindow.Show();
+        //POTYPROM::ShowWindow(&show_poty_prom);
+        // End Poty Pro window
+        
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
@@ -129,7 +229,7 @@ int main(int, char**)
             static float f = 0.0f;
             static int counter = 0;
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+            ImGui::Begin("Hello, world!", &show_another_window);                          // Create a window called "Hello, world!" and append into it.
 
             ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
             ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
@@ -150,7 +250,7 @@ int main(int, char**)
         // 3. Show another simple window.
         if (show_another_window)
         {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+            ImGui::Begin("Another Window f", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
             ImGui::Text("Hello from another window!");
             if (ImGui::Button("Close Me"))
                 show_another_window = false;
@@ -163,7 +263,21 @@ int main(int, char**)
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        // Update and Render additional Platform Windows
+        // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
+        //  For this specific demo app we could also call SDL_GL_MakeCurrent(window, gl_context) directly)
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            SDL_Window* backup_current_window = SDL_GL_GetCurrentWindow();
+            SDL_GLContext backup_current_context = SDL_GL_GetCurrentContext();
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+            SDL_GL_MakeCurrent(backup_current_window, backup_current_context);
+        }
+
         SDL_GL_SwapWindow(window);
+        Sleep(16);
     }
 
     // Cleanup

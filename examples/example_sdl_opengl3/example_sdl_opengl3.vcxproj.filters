@@ -8,6 +8,12 @@
       <UniqueIdentifier>{f18ab499-84e1-499f-8eff-9754361e0e52}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="programmer">
+      <UniqueIdentifier>{a65485a4-a742-4f1b-bb83-2ce07e949515}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="programmer\Models">
+      <UniqueIdentifier>{ebd263d8-428a-487a-a001-0726865fa14e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\imgui.cpp">
@@ -34,6 +40,15 @@
     <ClCompile Include="..\..\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>programmer</Filter>
+    </ClCompile>
+    <ClCompile Include="tables.cpp">
+      <Filter>programmer</Filter>
+    </ClCompile>
+    <ClCompile Include="Menubar.cpp">
+      <Filter>programmer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\imconfig.h">
@@ -53,6 +68,21 @@
     </ClInclude>
     <ClInclude Include="..\..\backends\imgui_impl_sdl.h">
       <Filter>sources</Filter>
+    </ClInclude>
+    <ClInclude Include="application.h">
+      <Filter>programmer</Filter>
+    </ClInclude>
+    <ClInclude Include="Menubar.h">
+      <Filter>programmer</Filter>
+    </ClInclude>
+    <ClInclude Include="tables.h">
+      <Filter>programmer</Filter>
+    </ClInclude>
+    <ClInclude Include="Bases.h">
+      <Filter>programmer</Filter>
+    </ClInclude>
+    <ClInclude Include="Events.h">
+      <Filter>programmer\Models</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
