@@ -84,6 +84,9 @@
     <ClInclude Include="Events.h">
       <Filter>programmer\Models</Filter>
     </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>programmer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.txt" />

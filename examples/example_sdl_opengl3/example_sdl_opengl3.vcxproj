@@ -179,6 +179,7 @@
     <ClInclude Include="Events.h" />
     <ClInclude Include="Menubar.h" />
     <ClInclude Include="tables.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\misc\debuggers\imgui.natvis" />

@@ -8,55 +8,32 @@
 #include <iostream>
 #include "imgui_impl_sdl.h"
 #include "imgui_internal.h"
+#include "Window.h"
 
 namespace POTYPROM
 {
-    typedef void (*EventListenerCallback)(const EventInfo_t&, const FocusArgs_t&);
+    /*template<typename T>*/
+    
 
-    typedef struct _FocusEventArgs
-    {
-        EventInfo_t info;
-        FocusArgs_t args;
-    } FocusEventArgs_t;
-
-    template<typename T>
-    class Window : public Element
-    {
-    public:
-        Window(SDL_Window*& window, bool& p_open);
-        void AddElement(T& el);
-        void OnFocus(const EventInfo_t&, const FocusArgs_t&);
-        void AddFocusEventListener(const EventListenerCallback&);
-        virtual void Show();
-        bool& pOpen;
-    private:
-        std::vector<T> elements;
-        std::vector<EventListenerCallback> focusListeners;
-        SDL_Window*& parent;
-        ImGuiID activeWindow;
-        bool focused;
-        FocusEventArgs_t focusEventArgs;
-    };
-
-    template<typename T>
-    Window<T>::Window(SDL_Window*& window, bool& p_open)
+    //template<typename T>
+    CWindow::CWindow(SDL_Window*& window, bool& p_open)
         : pOpen(p_open), parent(window), activeWindow((ImGuiID)-1), focused(false)
     {
-        static_assert(std::is_base_of<Element, T>::value, "Type of class must be based on Element type.");
+        //static_assert(std::is_base_of<Element, T>::value, "Type of class must be based on Element type.");
 
         AddFocusEventListener([](const EventInfo_t& info, const FocusArgs_t&) {
             std::cout << "Window id: " << info.windowID << std::endl;
         });
     }
 
-    template<typename T>
-    void Window<T>::AddElement(T& pEl)
+    //template<typename T>
+    void CWindow::AddElement(Element* pEl)
     {
         elements.push_back(pEl);
     }
 
-    template<typename T>
-    void Window<T>::Show()
+    //template<typename T>
+    void CWindow::Show()
     {
         if (pOpen)
         {
@@ -97,7 +74,7 @@ namespace POTYPROM
                     
                     for (int i = 0; i < len; i++)
                     {
-                        elements[i].Show();
+                        elements[i]->Show();
                     }
                     ImGui::Text("This is a child window!");
                     ImGui::End();
@@ -111,18 +88,33 @@ namespace POTYPROM
         }
     }
 
-    template<typename T>
-    void Window<T>::OnFocus(const EventInfo_t& info, const FocusArgs_t& args)
+    //template<typename T>
+    void CWindow::OnFocus(const EventInfo_t& info, const FocusArgs_t& args)
     {
         focusEventArgs.info = info;
         focusEventArgs.args = args;
         focused = true;
     }
 
-    template<typename T>
-    void Window<T>::AddFocusEventListener(const EventListenerCallback& listener)
+    //template<typename T>
+    void CWindow::AddFocusEventListener(const EventListenerCallback& listener)
     {
         focusListeners.push_back(listener);
+    }
+
+    void CPanel::AddElement(Element* el)
+    {
+        elements.push_back(el);
+    }
+
+    void CPanel::Show()
+    {
+        static bool show_another_window = true;
+        ImGui::Begin("Internal Test", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+        ImGui::Text("Hello from another window!");
+        if (ImGui::Button("Close Me"))
+            show_another_window = false;
+        ImGui::End();
     }
 }
 #endif

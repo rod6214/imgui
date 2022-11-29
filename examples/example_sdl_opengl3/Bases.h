@@ -8,6 +8,7 @@ namespace POTYPROM
     {
     public:
         virtual void Show() = 0;
+        virtual void AddElement(Element* el) = 0;
     };
 }
 #endif

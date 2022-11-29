@@ -166,10 +166,15 @@ int main(int, char**)
 
     bool show_poty_prom = true;
 
+    //POTYPROM::MyPanel myPanel;
+    //myPanel.Show();
     // Add MainWindow object
-    POTYPROM::Window<POTYPROM::TablePanel> mainWindow(window, show_poty_prom);
+    POTYPROM::CWindow mainWindow(window, show_poty_prom);
+    POTYPROM::CPanel secWindow;
     POTYPROM::TablePanel table;
-    mainWindow.AddElement(table);
+    table.SetNumRows(100);
+    mainWindow.AddElement(&table);
+    table.AddElement(&secWindow);
     // Main loop
     bool done = false;
     while (!done)
