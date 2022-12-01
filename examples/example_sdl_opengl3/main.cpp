@@ -165,16 +165,19 @@ int main(int, char**)
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     bool show_poty_prom = true;
-
+    
     //POTYPROM::MyPanel myPanel;
     //myPanel.Show();
     // Add MainWindow object
     POTYPROM::CWindow mainWindow(window, show_poty_prom);
     POTYPROM::CPanel secWindow;
     POTYPROM::TablePanel table;
+    POTYPROM::CComboBox combo({ "OPTION1", "OPTION2"});
+    
     table.SetNumRows(100);
     mainWindow.AddElement(&table);
     table.AddElement(&secWindow);
+    secWindow.AddElement(&combo);
     // Main loop
     bool done = false;
     while (!done)

@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "Events.h"
+#include <string>
 
 namespace POTYPROM
 {
@@ -39,5 +40,20 @@ namespace POTYPROM
         virtual void AddElement(Element* el) override;
     private:
         std::vector<Element*> elements;
+    };
+
+    class CComboBox : public Element
+    {
+    public:
+        CComboBox(std::vector<std::string> els);
+        ~CComboBox();
+        int GetSelectedOption();
+        virtual void Show() override;
+        virtual void AddElement(Element* el) override;
+    private:
+        std::vector<std::string> elements;
+        char* pElements;
+        void getInitPointer();
+        int selectedOption;
     };
 }

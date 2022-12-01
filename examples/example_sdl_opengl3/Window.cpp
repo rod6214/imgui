@@ -12,27 +12,19 @@
 
 namespace POTYPROM
 {
-    /*template<typename T>*/
-    
-
-    //template<typename T>
     CWindow::CWindow(SDL_Window*& window, bool& p_open)
         : pOpen(p_open), parent(window), activeWindow((ImGuiID)-1), focused(false)
     {
-        //static_assert(std::is_base_of<Element, T>::value, "Type of class must be based on Element type.");
-
         AddFocusEventListener([](const EventInfo_t& info, const FocusArgs_t&) {
             std::cout << "Window id: " << info.windowID << std::endl;
         });
     }
 
-    //template<typename T>
     void CWindow::AddElement(Element* pEl)
     {
         elements.push_back(pEl);
     }
 
-    //template<typename T>
     void CWindow::Show()
     {
         if (pOpen)
@@ -88,7 +80,6 @@ namespace POTYPROM
         }
     }
 
-    //template<typename T>
     void CWindow::OnFocus(const EventInfo_t& info, const FocusArgs_t& args)
     {
         focusEventArgs.info = info;
@@ -96,7 +87,6 @@ namespace POTYPROM
         focused = true;
     }
 
-    //template<typename T>
     void CWindow::AddFocusEventListener(const EventListenerCallback& listener)
     {
         focusListeners.push_back(listener);
@@ -111,10 +101,71 @@ namespace POTYPROM
     {
         static bool show_another_window = true;
         ImGui::Begin("Internal Test", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        ImGui::Text("Hello from another window!");
-        if (ImGui::Button("Close Me"))
-            show_another_window = false;
+        int len = static_cast<int>(elements.size());
+        for (int i = 0; i < len; i++)
+        {
+            elements[i]->Show();
+        }
         ImGui::End();
     }
+
+    CComboBox::CComboBox(std::vector<std::string> els)
+        : elements(els), pElements(NULL), selectedOption(0)
+    {
+        getInitPointer();
+    }
+
+    CComboBox::~CComboBox()
+    {
+        delete pElements;
+    }
+
+    int CComboBox::GetSelectedOption()
+    {
+        return selectedOption;
+    }
+
+    void CComboBox::Show()
+    {
+        int len = static_cast<int>(elements.size());
+        ImGui::Combo("combo", &selectedOption, pElements, len);
+    }
+    
+    void CComboBox::getInitPointer()
+    {
+        int lx = static_cast<int>(elements.size());
+        int ly = 0;
+
+        for (int i = 0; i < lx; i++)
+        {
+            auto option = elements[i];
+            ly += static_cast<int>(option.size()) + 2;
+        }
+
+        ly += 4;
+
+        pElements = new char[ly];
+        char* ptr = pElements;
+
+        for (int i = 0; i < lx; i++)
+        {
+            auto option = elements[i];
+            ly = static_cast<int>(option.size());
+            auto src = option.data();
+
+            for (int j = 0; j < ly; j++)
+            {
+                *(ptr++) = src[j];
+            }
+            *ptr++ = '\0';
+        }
+
+        *ptr++ = '\0';
+        *ptr++ = '\0';
+        *ptr++ = '\0';
+        *ptr++ = '\0';
+    }
+
+    void CComboBox::AddElement(Element*) {}
 }
 #endif
