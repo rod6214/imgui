@@ -1,9 +1,6 @@
 #pragma once
 #ifndef __MAINWINDOW_H__
 #define __MAINWINDOW_H__
-
-#include "application.h"
-#include "Events.h"
 #include <type_traits>
 #include <iostream>
 #include "imgui_impl_sdl.h"

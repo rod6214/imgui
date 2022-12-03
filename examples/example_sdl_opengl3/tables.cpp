@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "application.h"
+#include "tables.h"
+#include "imgui.h"
 
 POTYPROM::TablePanel::TablePanel() : rows(1) {}
 

@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "Events.h"
+#include "tables.h"
 #include <string>
 
 namespace POTYPROM

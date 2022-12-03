@@ -1,7 +1,7 @@
 #pragma once
 #ifndef __TABLES_H__
 #define __TABLES_H__
-#include "tables.h"
+#include "Bases.h"
 #include <vector>
 namespace POTYPROM
 {
