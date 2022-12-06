@@ -10,11 +10,19 @@
 namespace POTYPROM
 {
     CWindow::CWindow(SDL_Window*& window, bool& p_open)
-        : pOpen(p_open), parent(window), activeWindow((ImGuiID)-1), focused(false)
+        : pOpen(p_open), parent(window), activeWindow((ImGuiID)-1), focused(false), isPressDown(false)
     {
-        AddFocusEventListener([](const EventInfo_t& info, const FocusArgs_t&) {
+        /*AddFocusEventListener([](const EventInfo_t& info, const FocusArgs_t&) {
             std::cout << "Window id: " << info.windowID << std::endl;
-        });
+        });*/
+
+        /*AddButtonPressedEventListener([](const void* sender, const ButtonPressedEventArgs_t& args) {
+            std::cout << "Pressed" << std::endl;
+        });*/
+
+        /*AddButtonClickEventListener([](const void* sender, const ButtonClickEventArgs_t& args) {
+            std::cout << "Click" << std::endl;
+        });*/
     }
 
     void CWindow::AddElement(Element* pEl)
@@ -26,10 +34,6 @@ namespace POTYPROM
     {
         if (pOpen)
         {
-            if (ImGui::IsWindowFocused())
-            {
-                std::cout << "Test" << std::endl;
-            }
             static ImGuiWindowFlags sec_flags = ImGuiWindowFlags_Modal;
             static bool use_work_area = true;
             static bool show_another_window = true;
@@ -43,30 +47,49 @@ namespace POTYPROM
                 ImVec2 vec = viewport->WorkSize;
                 vec.x = vec.x / 2;
 
-                if (ImGui::Begin("MainPanel", &show_another_window, sec_flags))
+                if (show_another_window)
                 {
-                    auto activeId = ImGui::GetActiveID();
-
-                    if (activeId != activeWindow && activeId != 0 && focused)
+                    if (ImGui::Begin("MainPanel", &show_another_window))
                     {
-                        size_t len = focusListeners.size();
+                        activeWindow = ImGui::GetID("MainPanel");
+                        auto dd = ImGui::GetCurrentWindow();
+                        auto activeId = ImGui::GetActiveID();
+
+                        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+                        {
+                            int pressedEvents = static_cast<int>(buttonPressedListeners.size());
+                            for (int i = 0; i < pressedEvents; i++)
+                            {
+                                ButtonPressedEventArgs_t args;
+                                buttonPressedListeners[i](NULL, args);
+                            }
+
+                            if (!isPressDown)
+                            {
+                                int clickEvents = static_cast<int>(buttonClickListeners.size());
+                                for (int i = 0; i < clickEvents; i++)
+                                {
+                                    ButtonClickEventArgs_t args;
+                                    buttonClickListeners[i](NULL, args);
+                                }
+                                isPressDown = true;
+                            }
+                        }
+
+                        if (isPressDown && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+                        {
+                            isPressDown = false;
+                        }
+
+                        size_t len = elements.size();
+
                         for (int i = 0; i < len; i++)
                         {
-                            focusEventArgs.info.windowID = activeId;
-                            focusListeners[i](focusEventArgs.info, focusEventArgs.args);
+                            elements[i]->Show();
                         }
-                        activeWindow = activeId;
-                        focused = false;
+                        ImGui::Text("This is a child window!");
+                        ImGui::End();
                     }
-                    
-                    size_t len = elements.size();
-                    
-                    for (int i = 0; i < len; i++)
-                    {
-                        elements[i]->Show();
-                    }
-                    ImGui::Text("This is a child window!");
-                    ImGui::End();
                 }
                 
                 if (pOpen && ImGui::Button("Close this window"))
@@ -89,6 +112,25 @@ namespace POTYPROM
         focusListeners.push_back(listener);
     }
 
+    void CWindow::AddButtonPressedEventListener(const ButtonPressedEventCallback& listener)
+    {
+        this->buttonPressedListeners.push_back(listener);
+    }
+
+    void CWindow::AddButtonClickEventListener(const ButtonClickEventCallback& listener)
+    {
+        this->buttonClickListeners.push_back(listener);
+    }
+
+    void CWindow::OnButtonPressed(ButtonPressedEventArgs_t& args)
+    {
+        int len = static_cast<int>(buttonPressedListeners.size());
+        for (int i = 0; i < len; i++)
+        {
+            buttonPressedListeners[i](this, args);
+        }
+    }
+
     void CPanel::AddElement(Element* el)
     {
         elements.push_back(el);
@@ -97,13 +139,16 @@ namespace POTYPROM
     void CPanel::Show()
     {
         static bool show_another_window = true;
-        ImGui::Begin("Internal Test", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        int len = static_cast<int>(elements.size());
-        for (int i = 0; i < len; i++)
+        if (show_another_window)
         {
-            elements[i]->Show();
+            ImGui::Begin("Internal Test", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+            int len = static_cast<int>(elements.size());
+            for (int i = 0; i < len; i++)
+            {
+                elements[i]->Show();
+            }
+            ImGui::End();
         }
-        ImGui::End();
     }
 
     CComboBox::CComboBox(std::vector<std::string> els)
@@ -164,5 +209,18 @@ namespace POTYPROM
     }
 
     void CComboBox::AddElement(Element*) {}
+
+    void BaseEvent::dispatch(EventCallback* callback)
+    {
+        actions.push_back(callback);
+    }
+
+    void BaseEvent::OnEvent()
+    {
+        int len = static_cast<int>(actions.size());
+        for (int i = 0; i < len; i++)
+        {
+        }
+    }
 }
 #endif

@@ -18,6 +18,7 @@
 #include "application.h"
 #include "Events.h"
 #include <iostream>
+#include <imgui_internal.h>
 // End Poty Pro includes
 
 class Base
@@ -164,12 +165,14 @@ int main(int, char**)
     bool show_another_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    bool show_poty_prom = true;
+    //bool show_poty_prom = true;
     
     //POTYPROM::MyPanel myPanel;
     //myPanel.Show();
     // Add MainWindow object
-    POTYPROM::CWindow mainWindow(window, show_poty_prom);
+    POTYPROM::AppArgs_t appArgs;
+    POTYPROM::Start(appArgs);
+    /*POTYPROM::CWindow mainWindow(window, show_poty_prom);
     POTYPROM::CPanel secWindow;
     POTYPROM::TablePanel table;
     POTYPROM::CComboBox combo({ "OPTION1", "OPTION2"});
@@ -177,7 +180,7 @@ int main(int, char**)
     table.SetNumRows(100);
     mainWindow.AddElement(&table);
     table.AddElement(&secWindow);
-    secWindow.AddElement(&combo);
+    secWindow.AddElement(&combo);*/
     // Main loop
     bool done = false;
     while (!done)
@@ -191,27 +194,11 @@ int main(int, char**)
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
+            if (event.type == SDL_MOUSEBUTTONDOWN)
             {
-                POTYPROM::EventInfo_t eventInfo = {
-                    event.button.timestamp,
-                    event.button.windowID
-                };
-                POTYPROM::FocusArgs_t args;
-
-                //ImGui::ImGui_ImplSDL2_Data* bd = ImGui::ImGui_ImplSDL2_GetBackendData();
-                
-                /*if (event.window.windowID == SDL_GetWindowID(window))
-                {
-                    auto d = ImGui::GetID("MainPanel");
-                    ImGui::SetWindowFocus("MainPanel");
-                    
-                }*/
-
-                
-
-                mainWindow.OnFocus(eventInfo, args);
+                POTYPROM::ButtonPressedEvent(event, appArgs);
             }
+            
             if (event.type == SDL_QUIT)
                 done = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
@@ -224,7 +211,9 @@ int main(int, char**)
         ImGui::NewFrame();
 
         // Start Poty Pro window
-        mainWindow.Show();
+        if (appArgs.windows != NULL)
+            appArgs.windows->Show();
+        //mainWindow.Show();
         //POTYPROM::ShowWindow(&show_poty_prom);
         // End Poty Pro window
         
@@ -259,6 +248,12 @@ int main(int, char**)
         if (show_another_window)
         {
             ImGui::Begin("Another Window f", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+            /*auto dd = ImGui::GetCurrentWindow();
+
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Left, dd->ID))
+            {
+                std::cout << "ee" << std::endl;
+            }*/
             ImGui::Text("Hello from another window!");
             if (ImGui::Button("Close Me"))
                 show_another_window = false;

@@ -163,6 +163,7 @@
     <ClCompile Include="..\..\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\..\backends\imgui_impl_sdl.cpp" />
     <ClCompile Include="Menubar.cpp" />
+    <ClCompile Include="Startup.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="tables.cpp" />
     <ClCompile Include="main.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="Bases.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="Menubar.h" />
+    <ClInclude Include="Startup.h" />
     <ClInclude Include="tables.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

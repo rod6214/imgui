@@ -49,6 +49,9 @@
     <ClCompile Include="Menubar.cpp">
       <Filter>programmer</Filter>
     </ClCompile>
+    <ClCompile Include="Startup.cpp">
+      <Filter>programmer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\imconfig.h">
@@ -85,6 +88,9 @@
       <Filter>programmer\Models</Filter>
     </ClInclude>
     <ClInclude Include="Window.h">
+      <Filter>programmer</Filter>
+    </ClInclude>
+    <ClInclude Include="Startup.h">
       <Filter>programmer</Filter>
     </ClInclude>
   </ItemGroup>
