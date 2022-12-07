@@ -4,30 +4,42 @@
 #include "SDL_events.h"
 #include "imgui.h"
 #include "Window.h"
-//#include "imgui_impl_sdl.h"
-//#include "imgui_internal.h"
+
 namespace POTYPROM
 {
+    int calculateNumRows(int option);
+
     void Start(AppArgs_t& args)
     {
         bool show_poty_prom = true;
         args.windows = new POTYPROM::CWindow(args.pWindow, show_poty_prom);
         auto secWindow = new POTYPROM::CPanel();
-        auto table = new POTYPROM::TablePanel();
-        auto combo = new POTYPROM::CComboBox({ "OPTION1", "OPTION2" });
-        //POTYPROM::CPanel secWindow;
-        //POTYPROM::TablePanel table;
-        //POTYPROM::CComboBox combo({ "OPTION1", "OPTION2" });
+        static auto table = new POTYPROM::TablePanel();
+        static auto combo = new POTYPROM::CComboBox({ "16", "32", "64", "128", "256", "512", "1024", "2048", "4096", "8192", "16384", "32768", "65536" }, "Size");
+        auto textBox = new POTYPROM::CTextBox("0x0000", 45251, 10, "Start address");
 
-        table->SetNumRows(100);
+        combo->AddChangedEventListener([](const void* sender, const ComboChangedEventArgs_t& args) {
+            auto numRows = calculateNumRows(combo->GetSelectedOption());
+            table->SetNumRows(numRows);
+        });
+
+        auto numRows = calculateNumRows(combo->GetSelectedOption());
+        table->SetNumRows(numRows);
         args.windows->AddElement(table);
         table->AddElement(secWindow);
         secWindow->AddElement(combo);
+        secWindow->AddElement(textBox);
     }
 
-    void ButtonPressedEvent(SDL_Event&, AppArgs_t& args)
+    int calculateNumRows(int option)
     {
-        /*ButtonPressedEventArgs_t buttonPressedEvent;
-        args.windows->OnButtonPressed(buttonPressedEvent);*/
+        int options[] = { 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
+        return options[option] / 16;
     }
+
+    //void ButtonPressedEvent(SDL_Event&, AppArgs_t& args)
+    //{
+    //    /*ButtonPressedEventArgs_t buttonPressedEvent;
+    //    args.windows->OnButtonPressed(buttonPressedEvent);*/
+    //}
 }

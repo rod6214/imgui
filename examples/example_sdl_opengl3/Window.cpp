@@ -87,7 +87,7 @@ namespace POTYPROM
                         {
                             elements[i]->Show();
                         }
-                        ImGui::Text("This is a child window!");
+                        //ImGui::Text("This is a child window!");
                         ImGui::End();
                     }
                 }
@@ -151,8 +151,8 @@ namespace POTYPROM
         }
     }
 
-    CComboBox::CComboBox(std::vector<std::string> els)
-        : elements(els), pElements(NULL), selectedOption(0)
+    CComboBox::CComboBox(std::vector<std::string> els, const char* lbl)
+        : elements(els), pElements(NULL), selectedOption(0), label(lbl)
     {
         getInitPointer();
     }
@@ -169,8 +169,19 @@ namespace POTYPROM
 
     void CComboBox::Show()
     {
+        static int currentOption = selectedOption;
         int len = static_cast<int>(elements.size());
-        ImGui::Combo("combo", &selectedOption, pElements, len);
+        ImGui::Combo(label, &selectedOption, pElements, len);
+        if (currentOption != selectedOption)
+        {
+            currentOption = selectedOption;
+            len = static_cast<int>(this->changedEventListeners.size());
+            for (int i = 0; i < len; i++)
+            {
+                ComboChangedEventArgs_t args = { currentOption };
+                changedEventListeners[i](NULL, args);
+            }
+        }
     }
     
     void CComboBox::getInitPointer()
@@ -208,6 +219,11 @@ namespace POTYPROM
         *ptr++ = '\0';
     }
 
+    void CComboBox::AddChangedEventListener(const ComboChangedEventCallback callback)
+    {
+        changedEventListeners.push_back(callback);
+    }
+
     void CComboBox::AddElement(Element*) {}
 
     void BaseEvent::dispatch(EventCallback* callback)
@@ -222,5 +238,59 @@ namespace POTYPROM
         {
         }
     }
+
+    CTextBox::CTextBox(std::string str, int _id, int ml, const char* lbl):
+        flags(ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase),
+        id(_id),
+        bufferLength(0),
+        maxLength(ml),
+        label(lbl)
+    {
+        moveToBuffer(str);
+    }
+
+    CTextBox::CTextBox(std::string str, ImGuiInputTextFlags flgs, int _id, int ml, const char* lbl)
+        :flags(flgs),
+        id(_id),
+        bufferLength(0),
+        maxLength(ml),
+        label(lbl)
+    {
+        moveToBuffer(str);
+    }
+
+    CTextBox::~CTextBox()
+    {
+        delete buffer;
+    }
+
+    void CTextBox::moveToBuffer(std::string str)
+    {
+        auto src = str.data();
+        auto len = static_cast<int>(str.size());
+        bufferLength = len;
+        buffer = new char[256];
+        char* ptr = buffer;
+        for (int i = 0; i < len; i++)
+        {
+            *(ptr++) = src[i];
+        }
+        *ptr = '\0';
+    }
+
+    void CTextBox::SetId(int id)
+    {
+        this->id = id;
+    }
+
+    void CTextBox::Show()
+    {
+        auto len = maxLength + 1;
+        ImGui::PushID(id);
+        ImGui::InputText(label, buffer, len, flags);
+        ImGui::PopID();
+    }
+
+    void CTextBox::AddElement(Element* el) {}
 }
 #endif

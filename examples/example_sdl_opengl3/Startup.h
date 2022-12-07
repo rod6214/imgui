@@ -6,5 +6,5 @@
 namespace POTYPROM
 {
     void Start(AppArgs_t& args);
-    void ButtonPressedEvent(SDL_Event& event, AppArgs_t& args);
+    //void ButtonPressedEvent(SDL_Event& event, AppArgs_t& args);
 }

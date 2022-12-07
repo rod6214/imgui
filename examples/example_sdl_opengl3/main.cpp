@@ -194,10 +194,10 @@ int main(int, char**)
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_MOUSEBUTTONDOWN)
+            /*if (event.type == SDL_MOUSEBUTTONDOWN)
             {
                 POTYPROM::ButtonPressedEvent(event, appArgs);
-            }
+            }*/
             
             if (event.type == SDL_QUIT)
                 done = true;
